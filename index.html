@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+
+<head>
+    <script src="https://d3dy5gmtp8yhk7.cloudfront.net/2.1/pusher.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+    <!-- Odometr includes -->
+    <script src="http://realhe.ro/cursor-meter/js/odometer-patched.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/odometer/0.4.7/themes/odometer-theme-default.css" />
+    <style>
+    </style>
+</head>
+
+<body style="font-size:32px">
+    <div id="odometer" class="odometer"></div>
+    <script>
+    window.onload = function() {
+
+        (function() {
+
+            var settings = {
+                    html: {
+                        placeholder: document.getElementById('odometer'),
+                    },
+                    bitfinex: {
+                        request: {
+                            channel: 'ticker',
+                            event: 'subscribe',
+                            pair: 'BTCUSD',
+                        },
+                        url: 'wss://api2.bitfinex.com:3000/ws',
+                    },
+                    bitstamp: {
+                        pusher: {
+                            key: 'de504dc5763aeef9ff52',
+                            channel: 'live_trades',
+                            event: 'trade',
+                        },
+                    },
+                    events: {
+                        bitfinex: 'price_update_bitfinex',
+                        bitstamp: 'price_update_bitstamp',
+                    },
+                    odometer: {
+                        auto: false,
+                        format: '( , ddd).dd',
+                        // duration: 1024,
+                    },
+                },
+                ticker = new BitcoinBGTicker(settings);
+
+            ticker.init();
+
+
+            function BitcoinBGTicker(settings) {
+                var self = this;
+
+                self.settings = settings;
+                self.price = 0;
+                self.prices = {};
+
+                self.init = function() {
+                    createPriceEvents();
+                    initBitfinex();
+                    initBitstamp();
+                };
+
+                self.emitPriceEvent = function(event) {
+                    document.dispatchEvent(event);
+                };
+
+                self.handlePriceEvent = function() {
+                    document.addEventListener(self.events.bitfinex.type,
+                        function() {
+                            handlePriceEvent(self.events.bitfinex.type);
+                        });
+
+                    document.addEventListener(self.events.bitstamp.type,
+                        function() {
+                            handlePriceEvent(self.events.bitstamp.type);
+                        });
+
+                    function handlePriceEvent(event_type) {
+                        var price = 0, counter = 0;
+
+                        if (self.prices[event_type] === self.price) return;
+
+                        self.prices[event_type] = self.price;
+
+                        console.log(self.prices);
+
+                        Object.keys(self.prices).forEach(function(e) {
+                            if (self.prices[e]) {
+                                price += self.prices[e];
+                                counter++;
+                            }
+                        });
+
+                        self.price = (price / counter).toFixed(2);
+
+                        if (handlePriceEvent.timeout) {
+                            clearTimeout(handlePriceEvent.timeout);
+                        }
+
+                        handlePriceEvent.timeout = setTimeout(function() {
+                            self.settings.html.placeholder.innerHTML = self.price;
+                        });
+                    }
+                };
+
+                function createPriceEvents() {
+                    self.events = {
+                        bitfinex: new CustomEvent(self.settings.events.bitfinex),
+                        bitstamp: new CustomEvent(self.settings.events.bitstamp),
+                    };
+
+                    self.handlePriceEvent();
+                }
+
+                function initBitfinex() {
+                    var event = self.events.bitfinex,
+                        event_name = self.settings.events.bitfinex,
+                        settings = self.settings.bitfinex,
+                        ws = new WebSocket(settings.url);
+
+                    ws.onopen = function() {
+                        ws.send(JSON.stringify(settings.request));
+                    };
+
+                    ws.onmessage = function(response) {
+                        var data = JSON.parse(response.data);
+
+                        initPrice(data);
+                    };
+
+                    function initPrice(data) {
+                        if (data.length === 11) {
+                            self.price = data[1];
+                            self.emitPriceEvent(event);
+
+                            initPrice = function(data) {
+                                if (data.length === 11) {
+                                    self.price = data[1];
+                                    self.emitPriceEvent(event);
+                                }
+                            };
+                        }
+                    }
+                }
+
+                function initBitstamp() {
+                    var event = self.events.bitstamp,
+                        event_name = self.settings.events.bitstamp,
+                        settings = self.settings.bitstamp.pusher,
+                        pusher = new Pusher(settings.key),
+                        trades_channel = pusher.subscribe(settings.channel);
+
+                    trades_channel.bind(settings.event,
+                        function(data) {
+                            initPrice(data);
+                        });
+
+                    function initPrice(data) {
+                        self.prices[event_name] = self.price = data.price;
+                        self.emitPriceEvent(event);
+
+                        initPrice = function(data) {
+                            self.price = data.price;
+                            self.emitPriceEvent(event);
+                        };
+                    }
+                }
+            }
+        })();
+    };
+    </script>
+</body>
+
+</html>
