@@ -137,13 +137,11 @@
 
                     function initPrice(data) {
                         if (data.length === 11) {
-                            self.price = data[1];
-                            self.emitPriceEvent(event);
+                            _initPrice_(event, event_name, data[1]);
 
                             initPrice = function(data) {
                                 if (data.length === 11) {
-                                    self.price = data[1];
-                                    self.emitPriceEvent(event);
+                                    __initPrice__(event, data[1]);
                                 }
                             };
                         }
@@ -163,14 +161,22 @@
                         });
 
                     function initPrice(data) {
-                        self.prices[event_name] = self.price = data.price;
-                        self.emitPriceEvent(event);
+                        _initPrice_(event, event_name, data.price);
 
                         initPrice = function(data) {
-                            self.price = data.price;
-                            self.emitPriceEvent(event);
+                            __initPrice__(event, data.price);
                         };
                     }
+                }
+
+                function _initPrice_(event, event_name, price) {
+                    self.prices[event_name] = self.price = price;
+                    self.emitPriceEvent(event);
+                }
+
+                function __initPrice__(event, price) {
+                    self.price = price;
+                    self.emitPriceEvent(event);
                 }
             }
         })();
