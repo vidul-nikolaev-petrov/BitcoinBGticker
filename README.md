@@ -1,6 +1,6 @@
 # README #
 
-### Supported Exchanges ###
+### Supported exchanges ###
 
 * [Bitfinex](http://docs.bitfinex.com/#websocket) (WebSockets)
 * [Bitstamp](https://www.bitstamp.net/websocket/) (WebSockets)
@@ -30,6 +30,18 @@ exchange: {
         url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
     },
 };
+```
+
+### Currency API ###
+
+* [Fixer.io](http://fixer.io)
+
+```
+#!javascript
+currency: {
+    interval: 3600 * 1000, // updated each hour
+    url: 'http://api.fixer.io/latest?base=USD',
+},
 ```
 
 ### Contribution guidelines ###
