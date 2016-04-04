@@ -2,9 +2,9 @@
 
 ### Supported Exchanges ###
 
-* Bitfinex (WebSockets)
-* Bitstamp (WebSockets)
-* Coinbase (Ajax)
+* [Bitfinex](http://docs.bitfinex.com/#websocket) (WebSockets)
+* [Bitstamp](https://www.bitstamp.net/websocket/) (WebSockets)
+* [Coinbase](https://developers.coinbase.com/api/v2#prices) (Ajax)
 
 ```
 #!javascript
