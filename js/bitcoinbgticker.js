@@ -33,8 +33,8 @@ window.onload = function () {
                 },
                 html: {
                     placeholder: {
-                        odometer: document.getElementById('odometer'),
-                        usd2bgn: document.getElementById('usd2bgn'),
+                        odoticker: document.getElementById('odoticker'),
+                        bgnticker: document.getElementById('bgnticker'),
                     },
                 },
                 odometer: {
@@ -123,8 +123,8 @@ window.onload = function () {
                     }
 
                     handlePriceEvent.timeout = setTimeout(function () {
-                        self.settings.html.placeholder.odometer.innerHTML = self.price;
-                        self.settings.html.placeholder.usd2bgn.innerHTML =
+                        self.settings.html.placeholder.odoticker.innerHTML = self.price;
+                        self.settings.html.placeholder.bgnticker.innerHTML =
                             (self.price * self.currency.bgn).toFixed(2);
                     });
                 }

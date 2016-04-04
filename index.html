@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html>
 
 <head>
@@ -6,27 +6,62 @@
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
     <!-- Odometr includes -->
-    <script src="http://realhe.ro/cursor-meter/js/odometer-patched.js"></script>
+    <script src="./js/odometer-patched.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/odometer/0.4.7/themes/odometer-theme-default.css" />
 
     <!-- BitcoinBGticker -->
     <script src="./js/bitcoinbgticker.js"></script>
 
     <style>
-    .odometer {
-        display: inline-block;
-        vertical-align: sup;
-        font-size: 1.85em;
-        margin-right: .12em;
-    }
-    </style>
+	#BitcoinBGticker {
+		height: 60px;
+		width: 150px;
+		font-size: 12px;
+		font-family: Arial;
+		position: relative;
+		overflow:hidden;
+		padding-top: 1px;
+		/* background for preview */
+		background: #2e00fc; /* Old browsers */
+		background: -moz-linear-gradient(top,  #2e00fc 1%, #9bd7ff 100%); /* FF3.6-15 */
+		background: -webkit-linear-gradient(top,  #2e00fc 1%,#9bd7ff 100%); /* Chrome10-25,Safari5.1-6 */
+		background: linear-gradient(to bottom,  #2e00fc 1%,#9bd7ff 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2e00fc', endColorstr='#9bd7ff',GradientType=0 ); /* IE6-9 */
+	}
+	#odoticker-wrapper {
+		color: #4B4B4B;
+		position: absolute;
+		font-weight: bold;
+		right: 10px;
+		top: 8px;
+		height: 32px;
+		line-height: 24px;
+		width: 140px;
+		text-align: right;
+		font-size: 24px;
+	}
+	#bgnticker-wrapper {
+		font-weight: bold;
+		color: white;
+		position: absolute;
+		right: 0px;
+		top: 34px;
+		margin-right: 10px;
+	}
+	</style>
 </head>
 
 <body>
-    USD
-    <div id="odometer" class="odometer"></div>
-    <br> BGN
-    <div id="usd2bgn" class="odometer"></div>
+    <div id="BitcoinBGticker">
+		<div id="odoticker-wrapper">
+			$<span id="odoticker" class="odometer"></span>
+		</div>
+		<div id="bgnticker-wrapper"><span id="bgnticker"></span> лв.
+			<span style="position: absolute; right: 0px; color: #666; font-weight: normal; text-align: right; width: 150px; font-size: 10px;">
+			BitcoinBG Price Index
+			</span>
+		</div>
+	</div>
 </body>
 
 </html>
