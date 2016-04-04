@@ -13,8 +13,6 @@
         content: '$';
         display: inline-block;
         vertical-align: sup;
-        /*        opacity: .6;*/
-        
         font-size: .85em;
         margin-right: .12em;
     }
@@ -32,24 +30,26 @@
                     html: {
                         placeholder: document.getElementById('odometer'),
                     },
-                    bitfinex: {
-                        request: {
-                            channel: 'ticker',
-                            event: 'subscribe',
-                            pair: 'BTCUSD',
+                    exchange: {
+                        bitfinex: {
+                            request: {
+                                channel: 'ticker',
+                                event: 'subscribe',
+                                pair: 'BTCUSD',
+                            },
+                            url: 'wss://api2.bitfinex.com:3000/ws',
                         },
-                        url: 'wss://api2.bitfinex.com:3000/ws',
-                    },
-                    bitstamp: {
-                        pusher: {
-                            key: 'de504dc5763aeef9ff52',
-                            channel: 'live_trades',
-                            event: 'trade',
+                        bitstamp: {
+                            pusher: {
+                                key: 'de504dc5763aeef9ff52',
+                                channel: 'live_trades',
+                                event: 'trade',
+                            },
                         },
-                    },
-                    coinbase: {
-                        url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
-                        interval: 10000,
+                        coinbase: {
+                            url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
+                            interval: 10000,
+                        },
                     },
                     events: {
                         bitfinex: 'price_update_bitfinex',
@@ -104,6 +104,7 @@
                 self.handlePriceEvent = function() {
                     Object.keys(self.events).forEach(function(e) {
                         var event = self.events[e];
+
                         document.addEventListener(event.type,
                             function() {
                                 handlePriceEvent(event.type);
@@ -145,7 +146,7 @@
 
                 function initBitfinex() {
                     var event = self.events.bitfinex,
-                        settings = self.settings.bitfinex,
+                        settings = self.settings.exchange.bitfinex,
                         ws = new WebSocket(settings.url);
 
                     ws.onopen = function() {
@@ -167,7 +168,7 @@
 
                 function initBitstamp() {
                     var event = self.events.bitstamp,
-                        settings = self.settings.bitstamp.pusher,
+                        settings = self.settings.exchange.bitstamp.pusher,
                         pusher = new Pusher(settings.key),
                         trades_channel = pusher.subscribe(settings.channel);
 
@@ -183,7 +184,7 @@
 
                 function initCoinbase() {
                     var event = self.events.coinbase,
-                        settings = self.settings.coinbase;
+                        settings = self.settings.exchange.coinbase;
 
                     startPolling();
 
