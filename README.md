@@ -41,7 +41,7 @@ exchange: {
 currency: {
     interval: 3600 * 1000, // updated each hour
     url: 'http://api.fixer.io/latest?base=USD',
-},
+};
 ```
 
 ### Contribution guidelines ###
@@ -50,7 +50,6 @@ currency: {
 * Code review
 * Other guidelines
 
-### Who do I talk to? ###
+### License ###
 
-* Repo owner or admin
-* Other community or team contact
+See the [LICENSE](LICENSE.txt) file for license rights and limitations (MIT).
