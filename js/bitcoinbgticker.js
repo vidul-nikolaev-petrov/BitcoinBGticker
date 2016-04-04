@@ -196,8 +196,9 @@ window.onload = function () {
                     ajax(self.settings.currency.url, function (response) {
                         var data = JSON.parse(response);
 
-                        self.currency.bgn = data.rates.BGN;
-                        console.log('USD to BGN', self.currency);
+                        Object.keys(data.rates).forEach(function(e){
+                            self.currency[e.toLowerCase()] = data.rates[e];
+                        });
                     });
                 }
             }
