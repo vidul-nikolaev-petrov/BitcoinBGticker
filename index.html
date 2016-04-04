@@ -45,7 +45,7 @@
                     odometer: {
                         auto: false,
                         format: '( , ddd).dd',
-                        // duration: 1024,
+                        duration: 2048,
                     },
                 },
                 ticker = new BitcoinBGTicker(settings);
@@ -96,9 +96,13 @@
 
                     function handlePriceEvent(event_type) {
                         var price = 0,
-                            counter = 0;
+                            exchanges = 0,
+                            requirements = true;
 
-                        if (self.prices[event_type] === self.price) return;
+                        requirements &= !isNaN(self.price)
+                        requirements &= self.prices[event_type] !== self.price;
+
+                        if (!requirements) return;
 
                         self.prices[event_type] = self.price;
 
@@ -107,11 +111,11 @@
                         Object.keys(self.prices).forEach(function(e) {
                             if (self.prices[e]) {
                                 price += self.prices[e];
-                                counter++;
+                                exchanges++;
                             }
                         });
 
-                        self.price = (price / counter).toFixed(2);
+                        self.price = (price / exchanges).toFixed(2);
 
                         if (handlePriceEvent.timeout) {
                             clearTimeout(handlePriceEvent.timeout);
