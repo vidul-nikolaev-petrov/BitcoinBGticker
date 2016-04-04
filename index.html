@@ -70,6 +70,19 @@
                     document.dispatchEvent(event);
                 };
 
+                function createPriceEvents() {
+                    self.events = {
+                        bitfinex: new CustomEvent(self.settings.events.bitfinex),
+                        bitstamp: new CustomEvent(self.settings.events.bitstamp),
+                    };
+
+                    Object.keys(self.events).forEach(function(e) {
+                        self.prices[self.events[e].type] = null;
+                    });
+
+                    self.handlePriceEvent();
+                }
+
                 self.handlePriceEvent = function() {
                     document.addEventListener(self.events.bitfinex.type,
                         function() {
@@ -89,7 +102,7 @@
 
                         self.prices[event_type] = self.price;
 
-                        console.log(self.prices);
+                        console.log('event_type:', event_type, self.prices); //remove in prod
 
                         Object.keys(self.prices).forEach(function(e) {
                             if (self.prices[e]) {
@@ -110,18 +123,8 @@
                     }
                 };
 
-                function createPriceEvents() {
-                    self.events = {
-                        bitfinex: new CustomEvent(self.settings.events.bitfinex),
-                        bitstamp: new CustomEvent(self.settings.events.bitstamp),
-                    };
-
-                    self.handlePriceEvent();
-                }
-
                 function initBitfinex() {
                     var event = self.events.bitfinex,
-                        event_name = self.settings.events.bitfinex,
                         settings = self.settings.bitfinex,
                         ws = new WebSocket(settings.url);
 
@@ -137,20 +140,13 @@
 
                     function initPrice(data) {
                         if (data.length === 11) {
-                            _initPrice_(event, event_name, data[1]);
-
-                            initPrice = function(data) {
-                                if (data.length === 11) {
-                                    __initPrice__(event, data[1]);
-                                }
-                            };
+                            _initPrice_(event, data[1]);
                         }
                     }
                 }
 
                 function initBitstamp() {
                     var event = self.events.bitstamp,
-                        event_name = self.settings.events.bitstamp,
                         settings = self.settings.bitstamp.pusher,
                         pusher = new Pusher(settings.key),
                         trades_channel = pusher.subscribe(settings.channel);
@@ -161,20 +157,11 @@
                         });
 
                     function initPrice(data) {
-                        _initPrice_(event, event_name, data.price);
-
-                        initPrice = function(data) {
-                            __initPrice__(event, data.price);
-                        };
+                        _initPrice_(event, data.price);
                     }
                 }
 
-                function _initPrice_(event, event_name, price) {
-                    self.prices[event_name] = self.price = price;
-                    self.emitPriceEvent(event);
-                }
-
-                function __initPrice__(event, price) {
+                function _initPrice_(event, price) {
                     self.price = price;
                     self.emitPriceEvent(event);
                 }
