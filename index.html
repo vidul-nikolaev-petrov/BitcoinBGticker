@@ -13,7 +13,8 @@
         content: '$';
         display: inline-block;
         vertical-align: sup;
-/*        opacity: .6;*/
+        /*        opacity: .6;*/
+        
         font-size: .85em;
         margin-right: .12em;
     }
@@ -46,9 +47,14 @@
                             event: 'trade',
                         },
                     },
+                    coinbase: {
+                        url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
+                        interval: 10000,
+                    },
                     events: {
                         bitfinex: 'price_update_bitfinex',
                         bitstamp: 'price_update_bitstamp',
+                        coinbase: 'price_update_coinbase',
                     },
                     odometer: {
                         auto: false,
@@ -72,6 +78,7 @@
                     createPriceEvents();
                     initBitfinex();
                     initBitstamp();
+                    initCoinbase();
                 };
 
                 self.emitPriceEvent = function(event) {
@@ -79,10 +86,13 @@
                 };
 
                 function createPriceEvents() {
-                    self.events = {
-                        bitfinex: new CustomEvent(self.settings.events.bitfinex),
-                        bitstamp: new CustomEvent(self.settings.events.bitstamp),
-                    };
+                    self.events = {};
+
+                    Object.keys(self.settings.events).forEach(function(e) {
+                        self.events[e] = new CustomEvent(e, {
+                            detail: self.settings.events[e],
+                        });
+                    })
 
                     Object.keys(self.events).forEach(function(e) {
                         self.prices[self.events[e].type] = null;
@@ -92,15 +102,13 @@
                 }
 
                 self.handlePriceEvent = function() {
-                    document.addEventListener(self.events.bitfinex.type,
-                        function() {
-                            handlePriceEvent(self.events.bitfinex.type);
-                        });
-
-                    document.addEventListener(self.events.bitstamp.type,
-                        function() {
-                            handlePriceEvent(self.events.bitstamp.type);
-                        });
+                    Object.keys(self.events).forEach(function(e) {
+                        var event = self.events[e];
+                        document.addEventListener(event.type,
+                            function() {
+                                handlePriceEvent(event.type);
+                            });
+                    });
 
                     function handlePriceEvent(event_type) {
                         var price = 0,
@@ -173,9 +181,41 @@
                     }
                 }
 
+                function initCoinbase() {
+                    var event = self.events.coinbase,
+                        settings = self.settings.coinbase;
+
+                    startPolling();
+
+                    function startPolling() {
+                        setTimeout(_startPolling_, 4096);
+
+                        setInterval(_startPolling_, settings.interval);
+
+                        function _startPolling_() {
+                            ajax(settings.url, function(data) {
+                                _initPrice_(event, JSON.parse(data).price);
+                            });
+                        }
+                    }
+                }
+
                 function _initPrice_(event, price) {
-                    self.price = price;
+                    self.price = +price;
                     self.emitPriceEvent(event);
+                }
+
+                function ajax(url, callback) {
+                    var xmlhttp = new XMLHttpRequest();
+
+                    xmlhttp.onreadystatechange = function() {
+                        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                            callback(xmlhttp.responseText);
+                        }
+                    }
+
+                    xmlhttp.open('GET', url, true);
+                    xmlhttp.send();
                 }
             }
         })();
