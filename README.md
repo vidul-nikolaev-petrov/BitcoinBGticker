@@ -26,8 +26,8 @@ exchange: {
         },
     },
     coinbase: {
+        interval: 30000,
         url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
-        interval: 10000,
     },
 };
 ```
