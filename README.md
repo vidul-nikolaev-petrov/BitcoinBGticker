@@ -1,21 +1,36 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+### Supported Exchanges ###
 
-### What is this repository for? ###
+* Bitfinex (WebSockets)
+* Bitstamp (WebSockets)
+* Coinbase (Ajax)
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+```
+#!javascript
+// exchanges' details
+exchange: {
+    bitfinex: {
+        request: {
+            channel: 'ticker',
+            event: 'subscribe',
+            pair: 'BTCUSD',
+        },
+        url: 'wss://api2.bitfinex.com:3000/ws',
+    },
+    bitstamp: {
+        pusher: {
+            key: 'de504dc5763aeef9ff52',
+            channel: 'live_trades',
+            event: 'trade',
+        },
+    },
+    coinbase: {
+        url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
+        interval: 10000,
+    },
+};
+```
 
 ### Contribution guidelines ###
 
