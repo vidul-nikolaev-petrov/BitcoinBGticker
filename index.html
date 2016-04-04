@@ -27,8 +27,9 @@
         (function() {
 
             var settings = {
-                    html: {
-                        placeholder: document.getElementById('odometer'),
+                    currency: {
+                        interval: 3600,
+                        url: 'http://api.fixer.io/latest',
                     },
                     exchange: {
                         bitfinex: {
@@ -56,6 +57,9 @@
                         bitstamp: 'price_update_bitstamp',
                         coinbase: 'price_update_coinbase',
                     },
+                    html: {
+                        placeholder: document.getElementById('odometer'),
+                    },
                     odometer: {
                         auto: false,
                         format: '( , ddd).dd',
@@ -70,12 +74,14 @@
             function BitcoinBGTicker(settings) {
                 var self = this;
 
+                self.currency = {};
                 self.settings = settings;
                 self.price = 0;
                 self.prices = {};
 
                 self.init = function() {
                     createPriceEvents();
+                    getCurrencyExchangeRate();
                     initBitfinex();
                     initBitstamp();
                     initCoinbase();
@@ -190,12 +196,11 @@
 
                     function startPolling() {
                         setTimeout(_startPolling_, 4096);
-
                         setInterval(_startPolling_, settings.interval);
 
                         function _startPolling_() {
-                            ajax(settings.url, function(data) {
-                                _initPrice_(event, JSON.parse(data).price);
+                            ajax(settings.url, function(response) {
+                                _initPrice_(event, JSON.parse(response).price);
                             });
                         }
                     }
@@ -204,6 +209,21 @@
                 function _initPrice_(event, price) {
                     self.price = +price;
                     self.emitPriceEvent(event);
+                }
+
+                function getCurrencyExchangeRate() {
+
+                    setTimeout(startPolling);
+                    setInterval(startPolling, self.settings.currency.interval);
+
+                    function startPolling() {
+                        ajax(self.settings.currency.url, function(response) {
+                            var data = JSON.parse(response);
+
+                            self.currency.bgn = data.rates.BGN; 
+                            console.log('USD to BGN', self.currency);
+                        });
+                    }
                 }
 
                 function ajax(url, callback) {
