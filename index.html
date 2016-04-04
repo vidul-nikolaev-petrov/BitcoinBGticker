@@ -19,9 +19,10 @@
 </head>
 
 <body>
-    USD <div id="odometer" class="odometer"></div>
-    <br>
-    BGN <div id="usd2bgn" class="odometer"></div>
+    USD
+    <div id="odometer" class="odometer"></div>
+    <br> BGN
+    <div id="usd2bgn" class="odometer"></div>
     <script>
     window.onload = function() {
 
@@ -61,7 +62,7 @@
                     html: {
                         placeholder: {
                             odometer: document.getElementById('odometer'),
-                            usd2bgn:document.getElementById('usd2bgn'),
+                            usd2bgn: document.getElementById('usd2bgn'),
                         },
                     },
                     odometer: {
@@ -198,17 +199,13 @@
                     var event = self.events.coinbase,
                         settings = self.settings.exchange.coinbase;
 
-                    startPolling();
+                    setTimeout(startPolling, 4096);
+                    setInterval(startPolling, settings.interval);
 
                     function startPolling() {
-                        setTimeout(_startPolling_, 4096);
-                        setInterval(_startPolling_, settings.interval);
-
-                        function _startPolling_() {
-                            ajax(settings.url, function(response) {
-                                _initPrice_(event, JSON.parse(response).price);
-                            });
-                        }
+                        ajax(settings.url, function(response) {
+                            _initPrice_(event, JSON.parse(response).price);
+                        });
                     }
                 }
 
@@ -226,7 +223,7 @@
                         ajax(self.settings.currency.url, function(response) {
                             var data = JSON.parse(response);
 
-                            self.currency.bgn = data.rates.BGN; 
+                            self.currency.bgn = data.rates.BGN;
                             console.log('USD to BGN', self.currency);
                         });
                     }
