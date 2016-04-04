@@ -28,7 +28,7 @@
 
             var settings = {
                     currency: {
-                        interval: 3600,
+                        interval: 3600 * 1000, // per hour 
                         url: 'http://api.fixer.io/latest',
                     },
                     exchange: {
