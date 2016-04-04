@@ -9,18 +9,19 @@
     <script src="http://realhe.ro/cursor-meter/js/odometer-patched.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/odometer/0.4.7/themes/odometer-theme-default.css" />
     <style>
-    .odometer .odometer-inside:before {
-        content: '$';
+    .odometer {
         display: inline-block;
         vertical-align: sup;
-        font-size: .85em;
+        font-size: 1.85em;
         margin-right: .12em;
     }
     </style>
 </head>
 
-<body style="font-size:32px">
-    <div id="odometer" class="odometer"></div>
+<body>
+    USD <div id="odometer" class="odometer"></div>
+    <br>
+    BGN <div id="usd2bgn" class="odometer"></div>
     <script>
     window.onload = function() {
 
@@ -29,7 +30,7 @@
             var settings = {
                     currency: {
                         interval: 3600 * 1000, // per hour 
-                        url: 'http://api.fixer.io/latest',
+                        url: 'http://api.fixer.io/latest?base=USD',
                     },
                     exchange: {
                         bitfinex: {
@@ -58,7 +59,10 @@
                         coinbase: 'price_update_coinbase',
                     },
                     html: {
-                        placeholder: document.getElementById('odometer'),
+                        placeholder: {
+                            odometer: document.getElementById('odometer'),
+                            usd2bgn:document.getElementById('usd2bgn'),
+                        },
                     },
                     odometer: {
                         auto: false,
@@ -145,7 +149,9 @@
                         }
 
                         handlePriceEvent.timeout = setTimeout(function() {
-                            self.settings.html.placeholder.innerHTML = self.price;
+                            self.settings.html.placeholder.odometer.innerHTML = self.price;
+                            self.settings.html.placeholder.usd2bgn.innerHTML =
+                                (self.price * self.currency.bgn).toFixed(2);
                         });
                     }
                 };
