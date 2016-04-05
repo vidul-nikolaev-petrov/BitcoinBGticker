@@ -51,9 +51,9 @@ window.onload = function () {
             var self = this;
 
             self.currency = {};
-            self.settings = settings;
             self.price = 0;
             self.prices = {};
+            self.settings = settings;
 
             self.init = function () {
                 browsersPolyfills();
@@ -99,7 +99,7 @@ window.onload = function () {
                         exchanges = 0,
                         requirements = true;
 
-                    requirements &= !isNaN(self.price)
+                    requirements &= !isNaN(self.price);
                     requirements &= self.prices[event_type] !== self.price;
 
                     if (!requirements) return;
