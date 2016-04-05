@@ -1,52 +1,50 @@
 window.onload = function () {
     (function () {
         var settings = {
-                currency: {
-                    interval: 3600 * 1000, // per hour 
-                    url: 'http://api.fixer.io/latest?base=USD',
+            currency: {
+                interval: 3600 * 1000, // per hour 
+                url: 'http://api.fixer.io/latest?base=USD',
+            },
+            exchange: {
+                bitfinex: {
+                    request: {
+                        channel: 'ticker',
+                        event: 'subscribe',
+                        pair: 'BTCUSD',
+                    },
+                    url: 'wss://api2.bitfinex.com:3000/ws',
                 },
-                exchange: {
-                    bitfinex: {
-                        request: {
-                            channel: 'ticker',
-                            event: 'subscribe',
-                            pair: 'BTCUSD',
-                        },
-                        url: 'wss://api2.bitfinex.com:3000/ws',
-                    },
-                    bitstamp: {
-                        pusher: {
-                            key: 'de504dc5763aeef9ff52',
-                            channel: 'live_trades',
-                            event: 'trade',
-                        },
-                    },
-                    coinbase: {
-                        interval: 30000,
-                        url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
+                bitstamp: {
+                    pusher: {
+                        key: 'de504dc5763aeef9ff52',
+                        channel: 'live_trades',
+                        event: 'trade',
                     },
                 },
-                events: {
-                    bitfinex: 'price_update_bitfinex',
-                    bitstamp: 'price_update_bitstamp',
-                    coinbase: 'price_update_coinbase',
-                },
-                html: {
-                    placeholder: {
-                        odoticker: document.getElementById('odoticker'),
-                        bgnticker: document.getElementById('bgnticker'),
-                    },
-                },
-                odometer: {
-                    auto: false,
-                    format: '( , ddd).dd',
-                    duration: 2048,
+                coinbase: {
+                    interval: 30000,
+                    url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
                 },
             },
-            ticker = new BitcoinBGTicker(settings);
+            events: {
+                bitfinex: 'price_update_bitfinex',
+                bitstamp: 'price_update_bitstamp',
+                coinbase: 'price_update_coinbase',
+            },
+            html: {
+                placeholder: {
+                    odoticker: document.getElementById('odoticker'),
+                    bgnticker: document.getElementById('bgnticker'),
+                },
+            },
+            odometer: {
+                auto: false,
+                format: '( , ddd).dd',
+                duration: 2048,
+            },
+        };
 
-
-        ticker.init();
+        new BitcoinBGTicker(settings).init();
 
 
         function BitcoinBGTicker(settings) {
@@ -58,6 +56,7 @@ window.onload = function () {
             self.prices = {};
 
             self.init = function () {
+                browsersPolyfills();
                 createPriceEvents();
                 getCurrencyExchangeRate();
                 initBitfinex();
@@ -196,9 +195,10 @@ window.onload = function () {
                     ajax(self.settings.currency.url, function (response) {
                         var data = JSON.parse(response);
 
-                        Object.keys(data.rates).forEach(function(e){
+                        Object.keys(data.rates).forEach(function (e) {
                             self.currency[e.toLowerCase()] = data.rates[e];
                         });
+                        console.log(self.currency)
                     });
                 }
             }
@@ -214,6 +214,33 @@ window.onload = function () {
 
                 xmlhttp.open('GET', url, true);
                 xmlhttp.send();
+            }
+        }
+
+        // IE miseries
+        function browsersPolyfills() {
+            polyfillEventIE();
+
+            function polyfillEventIE() {
+                if (typeof window.CustomEvent === 'function') return false;
+
+                function CustomEvent(event, params) {
+                    params = params || {
+                        bubbles: false,
+                        cancelable: false,
+                        detail: undefined,
+                    };
+
+                    var evt = document.createEvent('CustomEvent');
+
+                    evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+
+                    return evt;
+                }
+
+                CustomEvent.prototype = window.Event.prototype;
+
+                window.CustomEvent = CustomEvent;
             }
         }
     })();
