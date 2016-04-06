@@ -6,6 +6,10 @@ window.onload = function () {
                 url: 'http://api.fixer.io/latest?base=USD',
             },
             exchange: {
+                btc_e: {
+                    interval: 30000,
+                    url: 'https://btc-e.com/api/3/ticker/btc_usd',
+                },
                 bitfinex: {
                     request: {
                         channel: 'ticker',
@@ -27,6 +31,7 @@ window.onload = function () {
                 },
             },
             events: {
+                btc_e: 'price_update_btc_e',
                 bitfinex: 'price_update_bitfinex',
                 bitstamp: 'price_update_bitstamp',
                 coinbase: 'price_update_coinbase',
@@ -59,6 +64,7 @@ window.onload = function () {
                 browsersPolyfills();
                 createPriceEvents();
                 getCurrencyExchangeRate();
+                initBTC_E();
                 initBitfinex();
                 initBitstamp();
                 initCoinbase();
@@ -167,16 +173,34 @@ window.onload = function () {
                 }
             }
 
-            function initCoinbase() {
-                var event = self.events.coinbase,
-                    settings = self.settings.exchange.coinbase;
+            function initBTC_E() {
+                var event = self.events.btc_e,
+                    settings = self.settings.exchange.btc_e;
 
                 setTimeout(startPolling, 4096);
                 setInterval(startPolling, settings.interval);
 
                 function startPolling() {
                     ajax(settings.url, function (response) {
-                        _initPrice_(event, JSON.parse(response).price);
+                        var data = JSON.parse(response).query.results;
+
+                        _initPrice_(event, data.btc_usd.avg);
+                    });
+                }
+            }
+
+            function initCoinbase() {
+                var event = self.events.coinbase,
+                    settings = self.settings.exchange.coinbase;
+
+                setTimeout(startPolling, 8192);
+                setInterval(startPolling, settings.interval);
+
+                function startPolling() {
+                    ajax(settings.url, function (response) {
+                        var data = JSON.parse(response).query.results.json;
+
+                        _initPrice_(event, data.price);
                     });
                 }
             }
@@ -193,17 +217,16 @@ window.onload = function () {
 
                 function startPolling() {
                     ajax(self.settings.currency.url, function (response) {
-                        var data = JSON.parse(response);
+                        var data = JSON.parse(response).query.results.json;
 
                         Object.keys(data.rates).forEach(function (e) {
                             self.currency[e.toLowerCase()] = data.rates[e];
                         });
-                        console.log(self.currency)
                     });
                 }
             }
 
-            function ajax(url, callback) {
+            function ajax(url, callback, over_yahoo) {
                 var xmlhttp = new XMLHttpRequest();
 
                 xmlhttp.onreadystatechange = function () {
@@ -212,8 +235,16 @@ window.onload = function () {
                     }
                 }
 
-                xmlhttp.open('GET', url, true);
+                xmlhttp.open('GET', formatURL(url), true);
                 xmlhttp.send();
+
+                function formatURL(url) {
+                    var url_yahoo = 'http://query.yahooapis.com/v1/public/yql?' +
+                        'q=select%20*%20from%20json%20where%20url%3D%22' +
+                        encodeURIComponent(url) + '%22&format=json';
+
+                    return url_yahoo;
+                }
             }
         }
 
