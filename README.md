@@ -4,6 +4,7 @@
 
 * [Bitfinex](http://docs.bitfinex.com/#websocket) (WebSockets)
 * [Bitstamp](https://www.bitstamp.net/websocket/) (WebSockets)
+* [BTC-E](https://btc-e.com/api/3/docs) (Ajax)
 * [Coinbase](https://developers.coinbase.com/api/v2#prices) (Ajax)
 
 ```
@@ -24,6 +25,10 @@ exchange: {
             channel: 'live_trades',
             event: 'trade',
         },
+    },
+    btc_e: {
+        interval: 30000,
+        url: 'https://btc-e.com/api/3/ticker/btc_usd',
     },
     coinbase: {
         interval: 30000,

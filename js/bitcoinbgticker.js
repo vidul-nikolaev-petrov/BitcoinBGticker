@@ -226,7 +226,7 @@ window.onload = function () {
                 }
             }
 
-            function ajax(url, callback, over_yahoo) {
+            function ajax(url, callback) {
                 var xmlhttp = new XMLHttpRequest();
 
                 xmlhttp.onreadystatechange = function () {
