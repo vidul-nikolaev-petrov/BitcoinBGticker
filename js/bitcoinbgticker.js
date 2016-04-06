@@ -8,6 +8,7 @@ window.onload = function () {
             exchange: {
                 btc_e: {
                     interval: 30000,
+                    start_after: 1024,
                     url: 'https://btc-e.com/api/3/ticker/btc_usd',
                 },
                 bitfinex: {
@@ -27,6 +28,7 @@ window.onload = function () {
                 },
                 coinbase: {
                     interval: 30000,
+                    start_after: 2048,
                     url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
                 },
             },
@@ -64,9 +66,9 @@ window.onload = function () {
                 browsersPolyfills();
                 createPriceEvents();
                 getCurrencyExchangeRate();
-                initBTC_E();
                 initBitfinex();
                 initBitstamp();
+                initBTC_E();
                 initCoinbase();
             };
 
@@ -177,7 +179,7 @@ window.onload = function () {
                 var event = self.events.btc_e,
                     settings = self.settings.exchange.btc_e;
 
-                setTimeout(startPolling, 4096);
+                setTimeout(startPolling, settings.start_after);
                 setInterval(startPolling, settings.interval);
 
                 function startPolling() {
@@ -193,7 +195,7 @@ window.onload = function () {
                 var event = self.events.coinbase,
                     settings = self.settings.exchange.coinbase;
 
-                setTimeout(startPolling, 8192);
+                setTimeout(startPolling, settings.start_after);
                 setInterval(startPolling, settings.interval);
 
                 function startPolling() {
@@ -240,8 +242,7 @@ window.onload = function () {
 
                 function formatURL(url) {
                     var url_yahoo = 'http://query.yahooapis.com/v1/public/yql?' +
-                        'q=select%20*%20from%20json%20where%20url%3D%22' +
-                        encodeURIComponent(url) + '%22&format=json';
+                        'q=select * from json where url ="' + url + '"&format=json';
 
                     return url_yahoo;
                 }
