@@ -28,10 +28,12 @@ exchange: {
     },
     btc_e: {
         interval: 30000,
+        start_after: 1024,
         url: 'https://btc-e.com/api/3/ticker/btc_usd',
     },
     coinbase: {
         interval: 30000,
+        start_after: 2048,
         url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
     },
 };

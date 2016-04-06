@@ -6,11 +6,6 @@ window.onload = function () {
                 url: 'http://api.fixer.io/latest?base=USD',
             },
             exchange: {
-                btc_e: {
-                    interval: 30000,
-                    start_after: 1024,
-                    url: 'https://btc-e.com/api/3/ticker/btc_usd',
-                },
                 bitfinex: {
                     request: {
                         channel: 'ticker',
@@ -25,6 +20,11 @@ window.onload = function () {
                         channel: 'live_trades',
                         event: 'trade',
                     },
+                },
+                btc_e: {
+                    interval: 30000,
+                    start_after: 1024,
+                    url: 'https://btc-e.com/api/3/ticker/btc_usd',
                 },
                 coinbase: {
                     interval: 30000,
