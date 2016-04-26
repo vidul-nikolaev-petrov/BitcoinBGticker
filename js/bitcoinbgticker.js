@@ -22,14 +22,19 @@ window.onload = function () {
                     },
                 },
                 btc_e: {
-                    interval: 30000,
-                    start_after: 1024,
+                    interval: 30000, // 30 seconds
+                    start_after: 0004, // immediately
                     url: 'https://btc-e.com/api/3/ticker/btc_usd',
                 },
                 coinbase: {
-                    interval: 30000,
-                    start_after: 2048,
+                    interval: 30000, // 30 seconds
+                    start_after: 0004, // immediately
                     url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
+                },
+                kraken: {
+                    interval: 30000, // 30 seconds
+                    start_after: 0004, // immediately
+                    url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
                 },
             },
             events: {
@@ -37,6 +42,7 @@ window.onload = function () {
                 bitfinex: 'price_update_bitfinex',
                 bitstamp: 'price_update_bitstamp',
                 coinbase: 'price_update_coinbase',
+                kraken: 'price_update_kraken',
             },
             html: {
                 placeholder: {
@@ -70,6 +76,7 @@ window.onload = function () {
                 initBitstamp();
                 initBTC_E();
                 initCoinbase();
+                initKraken();
             };
 
             self.emitPriceEvent = function (event) {
@@ -203,6 +210,22 @@ window.onload = function () {
                         var data = JSON.parse(response).query.results.json;
 
                         _initPrice_(event, data.price);
+                    });
+                }
+            }
+
+            function initKraken() {
+                var event = self.events.kraken,
+                    settings = self.settings.exchange.kraken;
+
+                setTimeout(startPolling, settings.start_after);
+                setInterval(startPolling, settings.interval);
+
+                function startPolling() {
+                    ajax(settings.url, function (response) {
+                        var data = JSON.parse(response).query.results.json;
+
+                        _initPrice_(event, data.result.XXBTZUSD.c[0]);
                     });
                 }
             }
