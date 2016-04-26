@@ -5,8 +5,9 @@ window.onload = function () {
                 interval: 3600 * 1000, // per hour 
                 url: 'http://api.fixer.io/latest?base=USD',
             },
-            exchange: {
+            exchanges: {
                 bitfinex: {
+                    name: 'Bitfinex',
                     request: {
                         channel: 'ticker',
                         event: 'subscribe',
@@ -15,27 +16,34 @@ window.onload = function () {
                     url: 'wss://api2.bitfinex.com:3000/ws',
                 },
                 bitstamp: {
+                    name: 'Bitstamp',
                     pusher: {
                         key: 'de504dc5763aeef9ff52',
                         channel: 'live_trades',
                         event: 'trade',
                     },
                 },
+                /**
                 btc_e: {
+                    disabled: true,
                     interval: 30000, // 30 seconds
-                    start_after: 0004, // immediately
+                    name: 'BTC-E',
+                    start_after: 0128, // immediately
                     url: 'https://btc-e.com/api/3/ticker/btc_usd',
                 },
                 coinbase: {
                     interval: 30000, // 30 seconds
-                    start_after: 0004, // immediately
+                    name: 'Coinbase',
+                    start_after: 0128, // immediately
                     url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
                 },
                 kraken: {
                     interval: 30000, // 30 seconds
-                    start_after: 0004, // immediately
+                    name: 'Kraken',
+                    start_after: 0128, // immediately
                     url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
                 },
+                */
             },
             events: {
                 btc_e: 'price_update_btc_e',
@@ -64,6 +72,7 @@ window.onload = function () {
             var self = this;
 
             self.currency = {};
+            self.exchanges = {};
             self.price = 0;
             self.prices = {};
             self.settings = settings;
@@ -72,16 +81,20 @@ window.onload = function () {
                 browsersPolyfills();
                 createPriceEvents();
                 getCurrencyExchangeRate();
-                initBitfinex();
-                initBitstamp();
-                initBTC_E();
-                initCoinbase();
-                initKraken();
+                initExchanges();
             };
 
             self.emitPriceEvent = function (event) {
                 document.dispatchEvent(event);
             };
+
+            function initExchanges() {
+                _initExchanges_();
+
+                Object.keys(self.settings.exchanges).forEach(function (e) {
+                    self.exchanges[e].init();
+                });
+            }
 
             function createPriceEvents() {
                 self.events = {};
@@ -144,47 +157,58 @@ window.onload = function () {
                 }
             };
 
-            function initBitfinex() {
-                var event = self.events.bitfinex,
-                    settings = self.settings.exchange.bitfinex,
-                    ws = new WebSocket(settings.url);
+            function _initExchanges_() {
+                self.exchanges.bitfinex = {
+                    init: function () {
+                        var event = self.events.bitfinex,
+                            settings = self.settings.exchanges.bitfinex,
+                            ws = new WebSocket(settings.url);
 
-                ws.onopen = function () {
-                    ws.send(JSON.stringify(settings.request));
+                        this.ws = ws;
+
+                        ws.onopen = function () {
+                            ws.send(JSON.stringify(settings.request));
+                        };
+
+                        ws.onmessage = function (response) {
+                            var data = JSON.parse(response.data);
+
+                            initPrice(data);
+                        };
+
+                        function initPrice(data) {
+                            if (data.length === 11) {
+                                _initPrice_(event, data[1]);
+                            }
+                        }
+                    },
                 };
 
-                ws.onmessage = function (response) {
-                    var data = JSON.parse(response.data);
+                self.exchanges.bitstamp = {
+                    init: function () {
+                        var event = self.events.bitstamp,
+                            settings = self.settings.exchanges.bitstamp.pusher,
+                            pusher = new Pusher(settings.key),
+                            trades_channel = pusher.subscribe(settings.channel);
 
-                    initPrice(data);
-                };
+                        this.pusher = pusher;
+                        this.trades_channel = trades_channel;
 
-                function initPrice(data) {
-                    if (data.length === 11) {
-                        _initPrice_(event, data[1]);
+                        trades_channel.bind(settings.event,
+                            function (data) {
+                                initPrice(data);
+                            });
+
+                        function initPrice(data) {
+                            _initPrice_(event, data.price);
+                        }
                     }
-                }
-            }
-
-            function initBitstamp() {
-                var event = self.events.bitstamp,
-                    settings = self.settings.exchange.bitstamp.pusher,
-                    pusher = new Pusher(settings.key),
-                    trades_channel = pusher.subscribe(settings.channel);
-
-                trades_channel.bind(settings.event,
-                    function (data) {
-                        initPrice(data);
-                    });
-
-                function initPrice(data) {
-                    _initPrice_(event, data.price);
-                }
-            }
+                };
+            };
 
             function initBTC_E() {
                 var event = self.events.btc_e,
-                    settings = self.settings.exchange.btc_e;
+                    settings = self.settings.exchanges.btc_e;
 
                 setTimeout(startPolling, settings.start_after);
                 setInterval(startPolling, settings.interval);
@@ -200,7 +224,7 @@ window.onload = function () {
 
             function initCoinbase() {
                 var event = self.events.coinbase,
-                    settings = self.settings.exchange.coinbase;
+                    settings = self.settings.exchanges.coinbase;
 
                 setTimeout(startPolling, settings.start_after);
                 setInterval(startPolling, settings.interval);
@@ -216,7 +240,7 @@ window.onload = function () {
 
             function initKraken() {
                 var event = self.events.kraken,
-                    settings = self.settings.exchange.kraken;
+                    settings = self.settings.exchanges.kraken;
 
                 setTimeout(startPolling, settings.start_after);
                 setInterval(startPolling, settings.interval);
@@ -238,7 +262,7 @@ window.onload = function () {
             function getCurrencyExchangeRate() {
 
                 startPolling();
-                
+
                 setInterval(startPolling, self.settings.currency.interval);
 
                 function startPolling() {
