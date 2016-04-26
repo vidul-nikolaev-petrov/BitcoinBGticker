@@ -37,7 +37,7 @@ exchange: {
         start_after: 0004,
         url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
     },
-    coinbase: {
+    kraken: {
         interval: 30000,
         start_after: 0004,
         url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
