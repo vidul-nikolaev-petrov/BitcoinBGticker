@@ -237,7 +237,8 @@ window.onload = function () {
 
             function getCurrencyExchangeRate() {
 
-                setTimeout(startPolling);
+                startPolling();
+                
                 setInterval(startPolling, self.settings.currency.interval);
 
                 function startPolling() {
