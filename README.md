@@ -6,6 +6,7 @@
 * [Bitstamp](https://www.bitstamp.net/websocket/) (WebSockets)
 * [BTC-E](https://btc-e.com/api/3/docs) (Ajax)
 * [Coinbase](https://developers.coinbase.com/api/v2#prices) (Ajax)
+* [Kraken](https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD) (Ajax)
 
 ```
 #!javascript
@@ -28,13 +29,18 @@ exchange: {
     },
     btc_e: {
         interval: 30000,
-        start_after: 1024,
+        start_after: 0004,
         url: 'https://btc-e.com/api/3/ticker/btc_usd',
     },
     coinbase: {
         interval: 30000,
-        start_after: 2048,
+        start_after: 0004,
         url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
+    },
+    coinbase: {
+        interval: 30000,
+        start_after: 0004,
+        url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
     },
 };
 ```
