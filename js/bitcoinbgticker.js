@@ -21,11 +21,6 @@ window.onload = function () {
                         event: 'trade',
                     },
                 },
-                btc_e: {
-                    interval: 30000, // 30 seconds
-                    start_after: 0004, // immediately
-                    url: 'https://btc-e.com/api/3/ticker/btc_usd',
-                },
                 coinbase: {
                     interval: 30000, // 30 seconds
                     start_after: 0004, // immediately
@@ -34,11 +29,10 @@ window.onload = function () {
                 kraken: {
                     interval: 30000, // 30 seconds
                     start_after: 0004, // immediately
-                    url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
+                    url: 'https://api.kraken.com/0/public/Ticker?pair=XBTUSD',
                 },
             },
             events: {
-                btc_e: 'price_update_btc_e',
                 bitfinex: 'price_update_bitfinex',
                 bitstamp: 'price_update_bitstamp',
                 coinbase: 'price_update_coinbase',
@@ -74,7 +68,6 @@ window.onload = function () {
                 getCurrencyExchangeRate();
                 initBitfinex();
                 initBitstamp();
-                initBTC_E();
                 initCoinbase();
                 initKraken();
             };
@@ -179,22 +172,6 @@ window.onload = function () {
 
                 function initPrice(data) {
                     _initPrice_(event, data.price);
-                }
-            }
-
-            function initBTC_E() {
-                var event = self.events.btc_e,
-                    settings = self.settings.exchange.btc_e;
-
-                setTimeout(startPolling, settings.start_after);
-                setInterval(startPolling, settings.interval);
-
-                function startPolling() {
-                    ajax(settings.url, function (response) {
-                        var data = JSON.parse(response).query.results;
-
-                        _initPrice_(event, data.btc_usd.avg);
-                    });
                 }
             }
 

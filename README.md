@@ -4,7 +4,7 @@
 
 * [Bitfinex](http://docs.bitfinex.com/#websocket) (WebSockets)
 * [Bitstamp](https://www.bitstamp.net/websocket/) (WebSockets)
-* [BTC-E](https://btc-e.com/api/3/docs) (Ajax)
+* [BTC-E](https://btc-e.com/api/3/docs) (Ajax) (removed)
 * [Coinbase](https://developers.coinbase.com/api/v2#prices) (Ajax)
 * [Kraken](https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD) (Ajax)
 
