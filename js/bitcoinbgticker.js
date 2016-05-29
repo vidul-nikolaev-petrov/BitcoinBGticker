@@ -7,6 +7,8 @@ window.onload = function () {
             },
             exchange: {
                 bitfinex: {
+                    disabled: false,
+                    name: 'Bitfinex',
                     request: {
                         channel: 'ticker',
                         event: 'subscribe',
@@ -15,6 +17,8 @@ window.onload = function () {
                     url: 'wss://api2.bitfinex.com:3000/ws',
                 },
                 bitstamp: {
+                    disabled: false,
+                    name: 'Bitstamp',
                     pusher: {
                         key: 'de504dc5763aeef9ff52',
                         channel: 'live_trades',
@@ -22,16 +26,22 @@ window.onload = function () {
                     },
                 },
                 btc_e: {
+                    disabled: true,
+                    name: 'BTC_E',
                     interval: 30000, // 30 seconds
                     start_after: 0004, // immediately
                     url: 'https://btc-e.com/api/3/ticker/btc_usd',
                 },
                 coinbase: {
+                    disabled: false,
+                    name: 'Coinbase',
                     interval: 30000, // 30 seconds
                     start_after: 0004, // immediately
                     url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
                 },
                 kraken: {
+                    disabled: false,
+                    name: 'Kraken',
                     interval: 30000, // 30 seconds
                     start_after: 0004, // immediately
                     url: 'https://api.kraken.com/0/public/Ticker?pair=XBTUSD',
@@ -72,16 +82,23 @@ window.onload = function () {
                 browsersPolyfills();
                 createPriceEvents();
                 getCurrencyExchangeRate();
-                initBitfinex();
-                initBitstamp();
-                // initBTC_E(); // disable BTC-e
-                initCoinbase();
-                initKraken();
+                initExchanges();
             };
 
             self.emitPriceEvent = function (event) {
                 document.dispatchEvent(event);
             };
+
+            function initExchanges() {
+                Object.keys(self.settings.exchange).forEach(function (e) {
+                    var exchange = self.settings.exchange[e],
+                        init_function = 'init' + exchange.name;
+
+                    if (exchange.disabled) return;
+
+                    self[init_function]();
+                });
+            }
 
             function createPriceEvents() {
                 self.events = {};
@@ -144,7 +161,7 @@ window.onload = function () {
                 }
             };
 
-            function initBitfinex() {
+            self.initBitfinex = function () {
                 var event = self.events.bitfinex,
                     settings = self.settings.exchange.bitfinex,
                     ws = new WebSocket(settings.url);
@@ -166,7 +183,7 @@ window.onload = function () {
                 }
             }
 
-            function initBitstamp() {
+            self.initBitstamp = function () {
                 var event = self.events.bitstamp,
                     settings = self.settings.exchange.bitstamp.pusher,
                     pusher = new Pusher(settings.key),
@@ -182,7 +199,7 @@ window.onload = function () {
                 }
             }
 
-            function initBTC_E() {
+            self.initBTC_E = function () {
                 var event = self.events.btc_e,
                     settings = self.settings.exchange.btc_e;
 
@@ -198,7 +215,7 @@ window.onload = function () {
                 }
             }
 
-            function initCoinbase() {
+            self.initCoinbase = function () {
                 var event = self.events.coinbase,
                     settings = self.settings.exchange.coinbase;
 
@@ -214,7 +231,7 @@ window.onload = function () {
                 }
             }
 
-            function initKraken() {
+            self.initKraken = function () {
                 var event = self.events.kraken,
                     settings = self.settings.exchange.kraken;
 
@@ -238,7 +255,7 @@ window.onload = function () {
             function getCurrencyExchangeRate() {
 
                 startPolling();
-                
+
                 setInterval(startPolling, self.settings.currency.interval);
 
                 function startPolling() {
