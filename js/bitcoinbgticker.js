@@ -34,7 +34,7 @@ window.onload = function () {
                 kraken: {
                     interval: 30000, // 30 seconds
                     start_after: 0004, // immediately
-                    url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
+                    url: 'https://api.kraken.com/0/public/Ticker?pair=XBTUSD',
                 },
             },
             events: {
