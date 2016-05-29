@@ -13,6 +13,8 @@
 // exchanges' details
 exchange: {
     bitfinex: {
+        disabled: false,
+        name: 'Bitfinex',
         request: {
             channel: 'ticker',
             event: 'subscribe',
@@ -21,6 +23,8 @@ exchange: {
         url: 'wss://api2.bitfinex.com:3000/ws',
     },
     bitstamp: {
+        disabled: false,
+        name: 'Bitstamp',
         pusher: {
             key: 'de504dc5763aeef9ff52',
             channel: 'live_trades',
@@ -28,19 +32,25 @@ exchange: {
         },
     },
     btc_e: {
-        interval: 30000,
-        start_after: 0004,
+        disabled: true,
+        name: 'BTC_E',
+        interval: 30000, // 30 seconds
+        start_after: 0004, // immediately
         url: 'https://btc-e.com/api/3/ticker/btc_usd',
     },
     coinbase: {
-        interval: 30000,
-        start_after: 0004,
+        disabled: false,
+        name: 'Coinbase',
+        interval: 30000, // 30 seconds
+        start_after: 0004, // immediately
         url: 'https://api.exchange.coinbase.com/products/BTC-USD/ticker',
     },
     kraken: {
-        interval: 30000,
-        start_after: 0004,
-        url: 'https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD',
+        disabled: false,
+        name: 'Kraken',
+        interval: 30000, // 30 seconds
+        start_after: 0004, // immediately
+        url: 'https://api.kraken.com/0/public/Ticker?pair=XBTUSD',
     },
 };
 ```
