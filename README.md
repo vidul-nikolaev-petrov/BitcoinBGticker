@@ -8,8 +8,7 @@
 * [Coinbase](https://developers.coinbase.com/api/v2#prices) (Ajax)
 * [Kraken](https://api.kraken.com/0/public/Ticker?pair=XXBTZUSD) (Ajax)
 
-```
-#!javascript
+```javascript
 // exchanges' details
 exchange: {
     bitfinex: {
@@ -59,8 +58,7 @@ exchange: {
 
 * [Fixer.io](http://fixer.io)
 
-```
-#!javascript
+```javascript
 currency: {
     interval: 3600 * 1000, // updated each hour
     url: 'http://api.fixer.io/latest?base=USD',
